@@ -59,7 +59,7 @@ class IncidentManager:
                         continue
 
         except Exception as e:
-            print(f"Error parsing text dictionary: {e}")
+            pass
 
     def _get_text_by_index(self, index: int) -> Optional[str]:
         """

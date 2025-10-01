@@ -3,8 +3,8 @@
 import customtkinter as ctk
 from typing import Callable, List, Dict
 
-from src.config.point_mapping import GRAPH_PRESETS
-from src.config.ui_config import UI_FONTS, UI_PADDING, UI_COLORS
+from config.point_mapping import GRAPH_PRESETS
+from config.ui_config import UI_FONTS, UI_PADDING, UI_COLORS
 
 
 class PresetGraph(ctk.CTkFrame):

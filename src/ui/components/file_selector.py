@@ -7,9 +7,9 @@ from typing import Callable, List
 
 import customtkinter as ctk
 
-from src.util.file_util import get_file_size, cleanup_data_directory
-from src.util.validation import validate_file_exists, validate_file_extension
-from src.config.constants import DATA_FOLDER_PATH
+from util.file_util import get_file_size, cleanup_data_directory
+from util.validation import validate_file_exists, validate_file_extension
+from config.constants import DATA_FOLDER_PATH
 
 
 class FileSelector(ctk.CTkFrame):
@@ -230,9 +230,9 @@ class FileSelector(ctk.CTkFrame):
                         file_path = os.path.join(DATA_FOLDER_PATH, filename)
                         try:
                             os.remove(file_path)
-                            print(f"Deleted: {file_path}")
+                            pass
                         except Exception as e:
-                            print(f"Could not delete {file_path}: {e}")
+                            pass
 
             if "database_deleted" in self.callbacks:
                 self.callbacks["database_deleted"]()

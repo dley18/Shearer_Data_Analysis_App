@@ -4,7 +4,7 @@ import customtkinter as ctk
 from typing import Callable, List, Dict
 
 
-from src.config.ui_config import UI_PADDING, UI_COLORS
+from config.ui_config import UI_PADDING, UI_COLORS
 
 
 class IncidentViewer(ctk.CTkFrame):
@@ -344,7 +344,7 @@ class IncidentViewer(ctk.CTkFrame):
                     canvas.yview_moveto(scroll_fraction)
 
         except Exception as e:
-            print(f"Error scrolling to incident: {e}")
+            pass
 
     def set_search_mode(self, mode: str) -> None:
         """Set the search mode ('text' or 'occurrence')"""

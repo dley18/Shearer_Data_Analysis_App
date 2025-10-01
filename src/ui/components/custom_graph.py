@@ -5,8 +5,8 @@ from typing import Callable
 import customtkinter as ctk
 
 
-from src.config.point_mapping import IO_POINTS, VFD_POINTS
-from src.config.ui_config import UI_PADDING, UI_COLORS
+from config.point_mapping import IO_POINTS, VFD_POINTS
+from config.ui_config import UI_PADDING, UI_COLORS
 
 
 class CustomGraph(ctk.CTkFrame):

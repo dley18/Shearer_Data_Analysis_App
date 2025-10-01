@@ -30,7 +30,7 @@ class CSVGenerator:
 
             return True
         except Exception as e:
-            print(f"Failed to create CSV file: {e}")
+            pass
             return False
 
     def add_point_rows(self, point_name: str, row_data: List[Dict[str, Any]]) -> bool:
@@ -64,7 +64,7 @@ class CSVGenerator:
             return True
 
         except Exception as e:
-            print(f"Failed to add point to csv file: {e}")
+            pass
             return False
 
     def add_preset_rows(
@@ -103,5 +103,5 @@ class CSVGenerator:
             return True
 
         except Exception as e:
-            print(f"Failed to add preset to csv file: {e}")
+            pass
             return False

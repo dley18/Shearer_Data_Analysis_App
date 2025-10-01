@@ -2,13 +2,14 @@
 
 from PIL import Image
 
+import os
 from typing import Callable
 import ctypes
 import customtkinter as ctk
 
 
-from src.config.constants import APP_TITLE
-from src.config.ui_config import (
+from config.constants import APP_TITLE
+from config.ui_config import (
     APP_APPEARANCE,
     COMPONENT_DIMENSIONS,
     UI_COMPONENTS,
@@ -16,11 +17,11 @@ from src.config.ui_config import (
     UI_PADDING,
     UI_COLORS,
 )
-from src.ui.components.custom_graph import CustomGraph
-from src.ui.components.file_selector import FileSelector
-from src.ui.components.incident_viewer import IncidentViewer
-from src.ui.components.preset_graph import PresetGraph
-from src.util.file_util import get_path
+from ui.components.custom_graph import CustomGraph
+from ui.components.file_selector import FileSelector
+from ui.components.incident_viewer import IncidentViewer
+from ui.components.preset_graph import PresetGraph
+from util.file_util import get_path
 
 
 class MainWindow:
@@ -38,6 +39,12 @@ class MainWindow:
 
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
+        # Load internal shapes/Roboto fonts to use high quality renderer
+        ctk_dir = os.path.dirname(ctk.__file__)
+        ctk.FontManager.load_font(
+            os.path.join(ctk_dir, "assets/fonts/CustomTkinter_shapes_font.otf")
+        )
+
         # Set CustomTkinter theme
         ctk.set_appearance_mode(APP_APPEARANCE["appearance_mode"])
         ctk.set_default_color_theme(APP_APPEARANCE["color_theme"])
@@ -47,6 +54,15 @@ class MainWindow:
         self.root.title(APP_TITLE)
         self.root.geometry(APP_APPEARANCE["geometry"])
         self.root.bind("<Configure>", self.on_window_configure)
+
+        # Set font
+        try:
+            base = os.path.dirname(os.path.abspath(__file__))
+            ctk.FontManager.load_font(
+                os.path.join(base, "assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+            )
+        except Exception as e:
+            print(f"Failed to load font: {e}")
 
         ctk.set_widget_scaling(1)
         ctk.set_window_scaling(1)
@@ -64,8 +80,17 @@ class MainWindow:
 
     def on_window_configure(self, event):
         """Window event handler to re-hide tabs when window resizes."""
-        if "tabview" in self.components:
-            self.components["tabview"]._segmented_button.grid_remove()
+        tabview = self.components.get("tabview")
+        if not tabview:
+            return
+        # CTkTabview uses an internal _segmented_button; it may not exist yet on first configure
+        btn = getattr(tabview, "_segmented_button", None)
+        try:
+            if btn and int(btn.winfo_exists()):
+                btn.grid_remove()
+        except Exception:
+            # Ignore spurious Tk errors during layout churn
+            pass
 
     def switch_to_tab(self, tab_name: str) -> None:
         """Switch to a specific tab by name."""
@@ -92,6 +117,21 @@ class MainWindow:
         self.create_sidebar(main_frame)
         self.create_content_area(main_frame)
         self.create_footer(main_frame)
+
+        # Defer hiding of the tabview segmented button until widgets are realized
+        self.root.after_idle(self._hide_tab_header)
+
+    def _hide_tab_header(self) -> None:
+        """Hide CTkTabview's segmented button safely when available."""
+        tabview = self.components.get("tabview")
+        if not tabview:
+            return
+        btn = getattr(tabview, "_segmented_button", None)
+        try:
+            if btn and int(btn.winfo_exists()):
+                btn.grid_remove()
+        except Exception:
+            pass
 
     def create_header(self, parent: ctk.CTkFrame) -> None:
         """Create header section with title and logo."""

@@ -38,10 +38,8 @@ def enter_time_zone_offset(data: Dict, time_zone_offset: int) -> Dict:
         for point_name, time_value_list in data[category].items():
             for entry in time_value_list:
                 original_timestamp = int(float(entry["timestamp"]))
-                print(f"Original Timestamp: {original_timestamp}")
                 adjusted_timestamp = original_timestamp + offset
                 entry["timestamp"] = adjusted_timestamp
-                print(f"Timezone offset Timestamp: {entry["timestamp"]}")
 
     for preset_name, preset_data in data["preset"].items():
         for point_name, time_value_list in preset_data.items():

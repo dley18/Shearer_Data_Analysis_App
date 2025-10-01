@@ -52,13 +52,24 @@ def get_path(path: str) -> str:
     """
 
     if getattr(sys, "frozen", False):
-        base_path = getattr(sys, "_MEIPASS", None)
-        if base_path is None:
-            base_path = os.path.dirname(os.path.abspath(__file__))
+        base_path = getattr(sys, "_MEIPASS", None) or os.path.dirname(
+            os.path.abspath(__file__)
+        )
+        # In packaged builds, incoming paths may contain '../../assets/...'.
+        # Strip any parent traversal and anchor from the bundle root.
+        norm = path.replace("/", os.sep).replace("\\", os.sep)
+        # If path contains 'assets/', keep from there; else use normalized path without leading '..'
+        marker = f"assets{os.sep}"
+        idx = norm.find(marker)
+        if idx != -1:
+            norm = norm[idx:]
+        else:
+            while norm.startswith(f"..{os.sep}"):
+                norm = norm[3:]
+        return os.path.join(base_path, norm)
     else:
         base_path = os.path.dirname(os.path.abspath(__file__))
-
-    return os.path.join(base_path, path)
+        return os.path.join(base_path, path)
 
 
 def ensure_directory_exists(directory: str) -> None:
@@ -111,7 +122,7 @@ def decompress_datadownload(file_paths: List[str]) -> bool:
                         tar.extractall(path=DATA_FOLDER_PATH)
         return True
     except Exception as e:
-        print(f"An error occured while decompressing data download: {e}")
+        pass
         return False
 
 
@@ -130,7 +141,7 @@ def merge_batch(
       bool: True if merging successful, False otherwise
     """
     try:
-        print(f"File Utility: Merging batch into {target_database}")
+        pass
         with sqlite3.connect(target_database) as database_connection:
             database_cursor = database_connection.cursor()
 
@@ -145,7 +156,7 @@ def merge_batch(
             attached_database = None
             for db in file_paths:
                 if not os.path.exists(db):
-                    print(f"Database file does not exist: {db}")
+                    pass
                     continue
 
                 if "FB20.DC.1" in db or "temp_merge" in db:
@@ -154,12 +165,11 @@ def merge_batch(
                         attached_database = db
                         break
                     except Exception as e:
-                        print(f"Failed to attch {db}: {e}")
+                        pass
                         continue
 
             # Get list of tables and create them in the target database
             try:
-                print(f"File Utility: Querying sqlite_master for {attached_database}")
                 try:
                     database_cursor.execute(
                         f"SELECT name, sql FROM {alias}.sqlite_master WHERE type = 'table'",
@@ -169,12 +179,12 @@ def merge_batch(
 
                 tables = database_cursor.fetchall()
                 if not tables:
-                    print(f"Warning: No tables found in {attached_database}")
+                    pass
                 else:
-                    print(f"File Utility: Found tables in {attached_database}")
+                    pass
 
             except Exception as e:
-                print(f"Error querying sqlite_master for {attached_database}: {e}")
+                pass
                 try:
                     database_cursor.execute(f"DETACH DATABASE {alias}")
                 except sqlite3.OperationalError as e:
@@ -188,9 +198,7 @@ def merge_batch(
                     try:
                         database_cursor.execute(create_table_sql)
                     except sqlite3.OperationalError as e:
-                        print(
-                            f"Error creating table {table_name} in {target_database}: {e}"
-                        )
+                        pass
 
             # Detach the database
             try:
@@ -200,7 +208,7 @@ def merge_batch(
 
             for i, source_database in enumerate(file_paths):
                 if not os.path.exists(source_database):
-                    print(f"Database file does not exist: {source_database}")
+                    pass
                     continue
 
                 # Attach the source database to the target database
@@ -210,7 +218,7 @@ def merge_batch(
                         f"ATTACH DATABASE '{source_database}' AS {alias}"
                     )
                 except (sqlite3.OperationalError, Exception) as e:
-                    print(f"Failed to attach {source_database}: {e}")
+                    pass
 
                 # Insert data from each table
                 for table_name, _ in tables:
@@ -233,7 +241,7 @@ def merge_batch(
             return True
 
     except Exception as e:
-        print(f"Failed to merge batch of databases: {e}")
+        pass
         return False
 
 
@@ -269,7 +277,7 @@ def merge_database_files(file_paths: List[str]) -> bool:
         return True
 
     except Exception as e:
-        print(f"Failed to merge database files: {file_paths}")
+        pass
         return False
 
 
@@ -296,7 +304,7 @@ def cleanup_data_directory() -> bool:
             if db_file != os.path.join(DATA_FOLDER_PATH, "fbhmi.db"):
                 os.remove(db_file)
         except OSError as e:
-            print(f"Error deleting {db_file}: {e}")
+            pass
             return False
 
     return True

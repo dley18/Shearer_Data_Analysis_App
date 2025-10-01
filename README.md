@@ -96,8 +96,8 @@ from all FB database files.
 ### Setup
 1. Clone the repository:
    ```sh
-   git clone https://github.com/dley18/Shearer_Data_Analysis_App.git
-   cd Shearer_Data_Analysis_App
+   git clone https://ControlAutomation@dev.azure.com/ControlAutomation/C%20and%20A%20Projects/_git/FB2_DataDownloadTool
+   cd FB2_DataDownloadTool
    ```
 2. Install dependencies using UV
    ```sh
@@ -136,7 +136,7 @@ python src/main.py
 - **Timezone Missing from Data Dump**: Some data dumps will not include a time zone offset parameter, causing the "custom offset" dialog to show often
 
 ## Support
-- **Contact**: Dane Ley - daneley18@gmail.com
+- **Contact**: Dane Ley (Intern) - dane.ley@global.komatsu
 
 ## Version History
 - **v1.0**: Initial summer 2024 release with basic functionality and slow processing time

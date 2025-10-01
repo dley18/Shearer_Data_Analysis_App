@@ -3,7 +3,7 @@
 import threading
 import gc
 
-from config.constants import DATA_FOLDER_PATH
+from config.constants import DATA_FOLDER_PATH, DATA_FOLDER_HOME
 from core.workflow_manager import WorkflowManager
 from data.database_manager import DatabaseManager
 from ui.screen.main_window import MainWindow
@@ -27,16 +27,38 @@ class ApplicationController:
             create_folder(DATA_FOLDER_PATH)
 
             # Create main window
+            print("DEBUG: Creating MainWindow()")
             self.main_window = MainWindow()
+            print("DEBUG: MainWindow created")
 
             # Set up UI callbacks
             self.setup_ui_callbacks()
+            print("DEBUG: UI callbacks set up")
 
             # Start main loop
+            print("DEBUG: Entering Tk mainloop")
             self.main_window.run()
+            print("DEBUG: Tk mainloop exited")
 
         except Exception as e:
-            print(f"Error starting application: {e}")
+            # Do NOT swallow startup errors; write a log so packaged exe isn't silent
+            try:
+                import os, traceback
+                from util.file_util import ensure_directory_exists
+
+                ensure_directory_exists(DATA_FOLDER_HOME)
+                log_path = os.path.join(DATA_FOLDER_HOME, "startup_error.log")
+                with open(log_path, "w", encoding="utf-8") as f:
+                    f.write("DDT failed to start due to an exception.\n\n")
+                    traceback.print_exc(file=f)
+                    f.write("\nMessage: " + str(e) + "\n")
+                # Best-effort user hint via console if available
+                print(f"Startup error written to: {log_path}")
+            except Exception:
+                # If even logging fails, re-raise so outer handler can capture
+                pass
+            # Re-raise to let outer handler report/exit appropriately
+            raise
 
     def setup_ui_callbacks(self) -> None:
         """Set up callbacks for UI events."""
@@ -69,7 +91,7 @@ class ApplicationController:
         """Handle files added event."""
         try:
             # Log or process the file addition
-            print(f"Application Controller: {count} files added")
+            pass
             # Additional business logic could go here
 
         except Exception as e:
@@ -80,7 +102,7 @@ class ApplicationController:
         """Handle files removed event."""
         try:
             # Log or process the file removal
-            print(f"Application Controller: {count} files removed")
+            pass
             # Additional business logic could go here
 
         except Exception as e:
@@ -91,7 +113,7 @@ class ApplicationController:
         """Handle files cleared event."""
         try:
             # Log or process the file clearing
-            print(f"Application Controller: {count} files cleared")
+            pass
             # Additional business logic could go here
 
         except Exception as e:
@@ -101,7 +123,7 @@ class ApplicationController:
     def close_database_connections(self) -> None:
         """Close all open connections before deletion."""
         try:
-            print("Closing database connections...")
+            pass
 
             # Close WorkflowManager connections
             if self.workflow_manager:
@@ -114,9 +136,9 @@ class ApplicationController:
 
             gc.collect()
 
-            print("Database connections closed.")
+            pass
         except Exception as e:
-            print(f"Error closing database connections: {e}")
+            pass
 
     def on_database_deleted(self) -> None:
         """Handle deletion of main database."""
@@ -131,7 +153,7 @@ class ApplicationController:
         """Handle cleared custom points event."""
         try:
             # Log points clearing
-            print(f"Application Controller: {count} custom points cleared")
+            pass
 
         except Exception as e:
             if self.main_window:
@@ -141,7 +163,7 @@ class ApplicationController:
         """Handle cleared presets event."""
         try:
             # Log clearing
-            print(f"Application Controller: {count} presets cleared")
+            pass
 
         except Exception as e:
             if self.main_window:
@@ -322,11 +344,19 @@ def run_application() -> None:
         app = create_application()
         app.start_application()
     except Exception as e:
-        print(f"Failed to start application: {e}")
-    finally:
-        # Ensure cleanup
+        # Log to user's Documents/DDT for visibility in both dev and packaged exe
         try:
-            # app.shutdown_application()
+            import os, traceback
+            from util.file_util import ensure_directory_exists
+
+            ensure_directory_exists(DATA_FOLDER_HOME)
+            log_path = os.path.join(DATA_FOLDER_HOME, "startup_error.log")
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write("\n=== Application start failure ===\n")
+                traceback.print_exc(file=f)
+                f.write("\nMessage: " + str(e) + "\n")
+            print(f"Startup error written to: {log_path}")
+        except Exception:
             pass
-        except:
-            pass
+        # Re-raise so a console build also shows the error
+        raise

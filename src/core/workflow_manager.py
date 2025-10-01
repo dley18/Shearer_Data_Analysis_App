@@ -83,7 +83,6 @@ class WorkflowManager:
                     )
 
                     if io_point_info[io_point]["active"] == 0:
-                        print(f"{io_point} is not active. Skipping point...")
                         continue  # IO point is not active
 
                     else:
@@ -101,7 +100,7 @@ class WorkflowManager:
                         )
 
             except Exception as e:
-                print(f"Failed to process data in io: {e}")
+                pass
 
         if vfd_points:
             try:
@@ -117,7 +116,6 @@ class WorkflowManager:
                     )
 
                     if vfd_point_info[vfd_point]["active"] == 0:
-                        print(f"{vfd_point} is not active. Skipping point...")
                         continue  # VFD point is not active
 
                     else:
@@ -135,7 +133,7 @@ class WorkflowManager:
                         )
 
             except Exception as e:
-                print(f"Failed to process data in vfd: {e}")
+                pass
 
         if graph_presets:
             try:
@@ -158,7 +156,7 @@ class WorkflowManager:
                             )
 
                             if graph_preset_point_info[point]["active"] == 0:
-                                print(f"{point} is not active. Skipping preset...")
+                                pass
                                 break  # VFD point is not active - skip preset
 
                             else:
@@ -183,7 +181,7 @@ class WorkflowManager:
                             )
 
                             if graph_preset_point_info[point]["active"] == 0:
-                                print(f"{point} is not active. Skipping preset...")
+                                pass
                                 break  # IO point is not active - skip preset
 
                             else:
@@ -200,7 +198,7 @@ class WorkflowManager:
                                     preset, point, timestamp_value_list_preset
                                 )
             except Exception as e:
-                print(f"Failed to process data in presets: {e}")
+                pass
 
         if self.time_zone_offset:
             return enter_time_zone_offset(
@@ -260,7 +258,7 @@ class WorkflowManager:
                 temp_root.destroy()
                 return None
         except Exception as e:
-            print(f"Dialog error: {e}")
+            pass
             return None
 
     def generate_csv(self, data: dict) -> bool:
@@ -388,14 +386,14 @@ class WorkflowManager:
         if not self.time_zone_offset:
             offset = self.database_manager.get_time_zone_offset()
             if offset:
-                print(f"Found timezone offset in database: {offset}")
+                pass
                 self.time_zone_offset = offset
             else:
-                print("Waiting for timezone offset from another thread...")
+                pass
                 if self.wait_for_timezone_offset():
-                    print(f"Recieved timezone offset: {self.time_zone_offset}")
+                    pass
                 else:
-                    print("Timeout waiting for timezone offset")
+                    pass
 
         if self.time_zone_offset:
             new_timestamps = apply_time_zone_offset_to_report(
@@ -429,10 +427,10 @@ class WorkflowManager:
                 self.conn.close()
                 self.conn = None
 
-            print("WorkflowManager database connections closed")
+            pass
 
         except Exception as e:
-            print(f"Error closing WorkflowManager connections: {e}")
+            pass
 
     def clear_cached_data(self) -> None:
         """Clear any cached database data."""

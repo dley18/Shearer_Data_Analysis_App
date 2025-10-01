@@ -35,7 +35,7 @@ class SelectedDataManager:
                 self.data["io"][name] = time_value_list
             return True
         except Exception as e:
-            print(f"Failed to add point to data dictionary: {e}")
+            pass
             return False
 
     def add_preset(
@@ -60,7 +60,7 @@ class SelectedDataManager:
             self.data["preset"][preset_name][point_name] = time_value_list
             return True
         except Exception as e:
-            print(f"Failed to add point from preset to the data dictionary: {e}")
+            pass
             return False
 
     def get_data(self) -> Dict:
